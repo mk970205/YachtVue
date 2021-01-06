@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Yacht</title>
+
+    <link rel="stylesheet" type="text/css" href="./css/startBoard.css" />
+    <link rel="stylesheet" type="text/css" href="./css/table.css" />
+    <link rel="stylesheet" type="text/css" href="./css/gameArea.css" />
+    <link rel="stylesheet" type="text/css" href="./css/common.css" />
+    <link rel="stylesheet" type="text/css" href="./css/endBoard.css" />
+
+    <script src="./js/vue/dist/vue.min.js"></script>
+    <script src="./js/diceFunc.js"></script>
+    <script src="./js/utility.js"></script>
+    <script src="./js/component.js"></script>
+    <script src="./js/gameManager.js"></script>
+</head>
+
+<body>
+<div id="start-board" v-if="state.gameflow.curr == 'Start'">
+    <div id="title">Yacht!</div>
+    <div id="player-slot">
+        <div v-for="(_, idx) in playerList" id="player-input">
+            <input id="player-name" v-model="playerList[idx]" :placeholder="placeholder(idx)" />
+            <button id="remove-btn" v-if="idx >= 2" @click="removeUser(idx)">❌</button>
+        </div>
+        <button id="add-btn" @click="addUser">➕</button>
+    </div>
+    <button id="start-btn" @click="startGame">START</button>
+</div>
+<div id="score-table" v-if="state.gameflow.curr != 'Start'">
+    <table>
+        <tr>
+            <th>Turn{{ state.currTurn }}</th>
+            <th v-for="n in totalPlayer" :class="{ spotlight: (n == state.currPlayer) }">{{ state.playerList[n - 1] }}</th>
+        </tr>
+
+        <tr is="score-section" v-for="(item, idx) in mergeScore(comb.slice(0, 6), state.playerScore.slice(0, 6))" 
+            :item="item" :idx="idx" :state="state" :total-player:="totalPlayer" @click-comb="chooseComb">
+        </tr>
+
+        <tr class="stat">
+            <th><div>Sum of Pair</div></th>
+            <td v-for="n in totalPlayer"><div :style="">{{ state.playerScore[12][n - 1] }} / 63</div></td>
+        </tr>
+
+        <tr class="stat">
+            <th><div>Bonus (+35)</div></th>
+            <td v-for="n in totalPlayer"><div>
+                <span v-if="state.playerScore[12][n - 1] >= 63">✔️</span>
+            </div></td>
+        </tr>
+
+        <tr is="score-section" v-for="(item, idx) in mergeScore(comb.slice(6), state.playerScore.slice(6))" 
+            :item="item" :idx="idx" :state="state" :total-player="totalPlayer" :offset="6" @click-comb="chooseComb">
+        </tr> 
+        <tr class="stat"><th><div>Total</div></th>
+            <td v-for="n in totalPlayer"><div :class="{ spotlight: isFristGrade(n) }">
+                {{ state.playerScore[13][n - 1] }}
+            </div></td>
+        </tr>
+    </table>
+</div>
+
+<div id="game-area" class="centered-flex" v-fi="state.gameflow.curr != 'End'">
+    <div id="dice-slot" class="centered-flex">
+        <dice :list="state.slotDice" @click-dice="slotToBowl"></dice>
+    </div>
+    <div id="dice-bowl" class="centered-flex">
+        <div v-if="state.gameflow.curr == 'Playing'" id="roll-counter">
+            Roll {{ state.rollCount }} / {{ state.rollLimit }}</div>
+        <dice :list="state.bowlDice" @click-dice="bowlToSlot"></dice>
+    </div>
+    <div id="btn-container" class="centered-flex">
+        <button style="background-color: #2196f3;" @click="reroll" :disabled="state.numOfDice == 0">굴리기</button>
+        <button style="background-color: #3f51b5;" @click="popAll" v-if="state.numOfDice != 5">전부 꺼내기</button>
+        <button style="background-color: #3f51b5;" @click="endTurn" v-else>턴 종료</button>
+    </div>
+</div>
+<div id="end-board" v-if="state.gameflow.curr == 'End'">
+    <div id="winner-is">RESULT</div>
+    <grade-board :grade-list="state.gradeList"></grade-board>
+    <button id="restart-btn" @click="restart"><div>🔄</div></button>
+</div>
+
+<script type="text/javascript">
+
+var startBoard = new Vue({
+    el: '#start-board',
+    data: {
+        state: gameManager.state,
+        playerList: [ '', '', ],
+    },
+
+    methods: {
+        addUser() {
+            this.playerList.push('');
+        },
+
+        removeUser(idx) {
+            this.playerList.splice(idx, 1); 
+        },
+
+        placeholder(pidx) {
+            return `Player ${pidx + 1}`;
+        },
+
+        startGame() {
+            gameManager.startGame(this.playerList);
+        },
+    }
+})
+
+var scoreTable = new Vue({
+    el: '#score-table',
+    data: {
+        state: gameManager.state,
+        comb: DICE_COMB,
+    },
+
+    computed: {
+        totalPlayer() {
+            return this.state.totalPlayer;
+        },
+    },
+
+    methods: {
+        chooseComb(idx) {
+            gameManager.chooseComb(idx);
+        },
+
+        isFirstGrade(n) {
+            let gradeList = this.state.gradeList;
+            return Array.isArray(gradeList) && gradeList.length && gradeList[n - 1].grade == 1;
+        }
+    },
+})
+
+var gameArea = new Vue({
+    el: '#game-area',
+    data: {
+        state: gameManager.state,
+    },
+
+    methods: {
+        slotToBowl(idx) {
+            gameManager.slotToBowl(idx);
+        },
+
+        bowlToSlot(idx) {
+            gameManager.bowlToSlot(idx);
+        },
+
+        reroll() {
+            gameManager.reroll();
+        },
+        
+        popAll() {
+            gameManager.popAll();
+        },
+
+        endTurn() {
+            gameManager.endTurn();
+        },
+    },
+})
+
+var endBoard = new Vue({
+    el: '#end-board',
+    data: {
+        state: gameManager.state,
+    },
+
+    methods: {
+        restart() {
+            gameManager.restart();
+        },
+    },
+})
+
+</script>
+</body>
+</html>
