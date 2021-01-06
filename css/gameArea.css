@@ -1,0 +1,77 @@
+img {
+    height: 96px;
+    overflow: hidden;
+    border-radius: 21px;
+}
+
+.centered-flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#game-area {
+    width: 560px;
+    height: 800px;
+    padding: 0px 30px;
+    float: left;
+    display: flet;
+    flex-direction: column;
+    background-color: #a5422a;
+}
+
+#dice-slot {
+    height: 160px;
+}
+
+#dice-slot img:first-child {
+    margin-left: 0;
+}
+
+
+#dice-slot img:last-child {
+    margin-right: 0;
+}
+
+#dice-slot img {
+    margin: 10px;
+}
+
+#roll-counter {
+    font-size: 50px;
+    position: absolute;
+    top: 20px;
+    color: white;
+}
+
+#dice-bowl {
+    width: 100%;
+    flex-grow: 1;
+    background-color: #69041d;
+    padding: 25% 0%;
+    position: relative;
+}
+
+#dice-bowl img {
+    margin: 8px;
+}
+
+#btn-container {
+    height: 100px;
+}
+
+#btn-container > button {
+    margin: 10px;
+    width: 270px;
+    padding: 15px 0px;
+    color: white;
+    font-size: 16px;
+}
+
+#btn-container > button:first-child {
+    margin-left: 0;
+}
+
+#btn-container > button:last-child {
+    margin-right: 0;
+}
