@@ -1,0 +1,64 @@
+#end-board {
+    width: 620px;
+    height: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #d6ddff;
+}
+
+#winner-is {
+    margin: 50px 0 120px 0;
+    color: #3b00ca;
+    font-size: 40px;
+    font-family: 'Trebunchet MS', Helvetica, sans-serif;
+}
+
+#restart-btn {
+    margin: 30px;
+    width: 80%;
+    background-color: #8f5fff;
+}
+
+#restart-btn div {
+    padding: 20px 0;
+    font-size: 56px;
+}
+
+#grade-board {
+    width: 80%;
+    height: 400px;
+}
+
+.grade-row {
+    width: 100%;
+    padding: 20px 0px;
+    background-color: white;
+}
+
+.grade-row div {
+    display: inline-block;
+    text-align: center;
+}
+
+.grade-row div:nth-child(1) {
+    width: 60px;
+    float: left;
+    margin-left: 15px;
+}
+
+.grade-row div:nth-child(2) {
+    width: 120px;
+}
+
+.grade-row div:nth-child(3) {
+    width: 60px;
+    float: right;
+    margin-right: 15px;
+}
+
+#grade-header {
+    background-color: #4074e2;
+    color: white;
+    font: 20px Tahoma;
+}
