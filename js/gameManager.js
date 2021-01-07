@@ -103,24 +103,24 @@ var gameManager = {
         if(this.state.phase.curr !== 'Event') return;
     
 
-        // speed가 낮을 수록 주사위 굴리는 애니메이션 주기가 짧아짐
-        // 사다리꼴 모양의 시간 - 속도 그래프를 갖는다.
-        // 시작 후, 최대 속도가 될 때까지 선형적으로 속도를 높임 (phase -1)
-        // 최대속도에서 일정 시간 정지한 후 (phase 0)
-        // 선형적으로 속도를 낮춤 (phase 1)
-        // 처음 속도보다 낮아지면 종료
+        // intv가 낮을 수록 주사위 굴리는 애니메이션 주기가 짧아짐
+        // 사다리꼴 모양의 애니메이션 횟수 - 주기 그래프를 갖는다.
+        // 시작 후, 최소 주기가 될 때까지 선형적으로 주기를 줄임 (phase -1)
+        // 일정 횟수 이상 애니메이션이 돌아갈 때까지 정지한 후 (phase 0)
+        // 다시 선형적으로 주기를 늘임 (phase 1)
+        // 처음 주기보다 길어지면 종료
 
-        let initSpeed = 450;
-        let peakSpeed = 50;
+        let initIntv = 450;
+        let peakIntv = 50;
         let accel = -50;
         let decel = 130;
         let peakCnt = 20;
         let phase = -1;
 
-        let intv = initSpeed;
+        let intv = initIntv;
         let currPeakCnt = 0;
 
-        while(phase !== 1 || intv <= initSpeed) {
+        while(phase !== 1 || intv <= initIntv) {
             this.state.bowlDice.forEach((el, idx) => {
                 if(el.value === 0) return;
                 let nextDice = generateDice();
@@ -131,7 +131,7 @@ var gameManager = {
                 this.state.bowlDice[idx].value = nextDice;
             });
 
-            if(phase === -1 && intv === peakSpeed) {
+            if(phase === -1 && intv === peakIntv) {
                 phase = 0;
             }
 
@@ -153,5 +153,142 @@ var gameManager = {
     sortAll() {
         this.state.bowlDice.sort(diceSorter);
         this.state.slotDice.sort(diceSorter);
+    },
+
+    // 저장슬롯 -> 보울로 주사위 이동
+    slotToBowl(idx) {
+        if(this.state.gameflow.curr !== 'Playing' || this.state.phase.curr !== 'Roll') return;
+        if(this.state.slotDice[idx].value === 0) return;
+
+        moveDice(this.state.slotDice, this.state.bowlDice, idx);
+        this.state.numOfDice++;
+    },
+
+    // 보울 -> 저장슬롯으로 주사위 이동
+    bowlToSlot(idx) {
+        if(this.state.gameflow.curr !== 'Playing' || this.state.phase.curr !== 'Roll') return;
+        if(this.state.bowlDice[idx].value === 0) return;
+
+        moveDice(this.state.bowlDice, this.state.slotDice, idx);
+        this.state.numOfDice--;
+    },
+
+    // 슬롯의 주사위를 모두 꺼냄
+    popAll() {
+        if(this.state.gameflow.curr !== 'Playing' || this.state.phase.curr !== 'Roll') return;
+        this.state.slotDice.forEach((el, idx) => {
+            if(el.value !== 0) moveDice(this.state.slotDice, this.state.bowlDice, idx);
+        })
+
+        this.state.bowlDice.sort(diceSorter);
+        this.state.numOfDice = 5;
+    },
+
+    // 굴리기 종료 버튼을 눌렀을 때 점수를 표시하고 턴을 끝낼 준비를 함
+    endTurn() {
+        if(this.state.gameflow.curr !== 'Playing' || this.state.phase.curr !== 'Roll') return;
+        
+        let newScore = analyzeDiceScore(this.state.bowlDice);
+        for(let i = 0; i < newScore.length; i++) {
+            Vue.set(this.state.diceScore, i, newScore[i]);
+        }
+
+        this.state.phase.transit('End Turn');
+    },
+
+    // 고를 수 있는 조합을 선택
+    chooseComb(idx) {
+        let pidx = this.state.currPlayer - 1;
+        if(this.state.phase.curr !== 'End Turn') return;
+        if(this.state.plyaerScore[idx][pidx] !== -1) return;
+        Vue.set(this.state.playerScore[idx], pidx, this.state.diceScore[idx]);
+        this.state.phase.transit('Score');
+        this.scoring();
+    },
+
+    // 점수 계산
+    scoring() {
+        if(this.state.phase.curr !== 'Score') return;
+        let pidx = this.state.currPlayer - 1;
+        let playerScore = this.state.playerScore.map(
+            (_, idx) => {
+                return this.state.playerScore[idx][pidx];
+            }
+        );
+
+        let pairSum = playerScore.slice(0, 6)
+            .filter((el) => el > 0)
+            .reduce((total, el) => total + el, 0);
+
+        let otherSum = playerScore.slice(6, 12)
+            .filter((el) => el > 0)
+            .reduce((total, el) => total + el, 0);
+
+        let totalScore = pairSum + otherSum + ((pairSum >= 63) ? 35 : 0);
+        Vue.set(this.state.playerScore[12], pidx, pairSum);
+        Vue.set(this.state.playerScore[13], pidx, totalScore);
+        this.afterScore();
+    },
+
+    // 점수 매기기 후
+    afterScore() {
+        if(this.state.phase.curr !== 'Score') return;
+
+        if(this.state.currPlayer === this.state.totalPlayer) {
+            this.state.currTurn++;
+            this.state.currPlayer = 0;
+        }
+        this.state.currPlayer++;
+
+        if(this.state.currTurn > 12) {
+            this.state.gameflow.transit('End');
+            this.endGame();
+        }
+        else {
+            this.state.phase.transit('Roll');
+            this.startTurn();
+        }
+    },
+
+    // 게임 종료
+    endGame() {
+        if(this.state.phase.curr !== 'End') return;
+        this.state.currPlayer = -1;
+        this.state.gradeList = this.calcGrade();
+    },
+
+    // 순위 매기기
+    calcGrade() {
+        let totalScore = record = this.state.playerScore[13];
+
+        record = record.filter((el, idx) => record.indexOf(el) === idx);
+        record.sort((lhs, rhs) => rhs - lhs);
+
+        let gradeList = Array(this.state.totalPlayer);
+        let gradeCnt = 1;
+        record.forEach(rec => {
+            let duplCnt = 0;
+            totalScore.forEach((el, idx) => {
+                if(el === rec) {
+                    gradeList[idx] = {
+                        name: this.state.playerList[idx],
+                        score: el,
+                        grade: gradeCnt,
+                    };
+                    duplCnt++;
+                }
+            });
+            gradeCnt += duplCnt;
+        });
+        gradeList.sort((lhs, rhs) => lhs.grade - rhs.grade);
+
+        return gradeList;
+    },
+
+    // 재시작
+    restart() {
+        if(this.state.gameflow.curr !== 'End') return;
+        this.state.gameflow.transit('Start');
+        this.startGame(this.state.playerList);
     }
 }
