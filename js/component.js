@@ -17,7 +17,7 @@ Vue.component('dice', {
     },
 });
 
-var scoreSectionData = { endState: 'End TUrn' };
+var scoreSectionData = { endState: 'End Turn' };
 Vue.component('score-section', {
     props: {
         item: {

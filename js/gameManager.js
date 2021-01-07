@@ -94,7 +94,7 @@ var gameManager = {
     async getRollEventResult() {
         this.state.phase.transit('Event');
         this.sortAll();
-        await this.getRollEventResult();
+        await this.rollEvent();
         this.sortAll();
         this.state.phase.transit('Roll');
     },
@@ -178,7 +178,7 @@ var gameManager = {
         if(this.state.gameflow.curr !== 'Playing' || this.state.phase.curr !== 'Roll') return;
         this.state.slotDice.forEach((el, idx) => {
             if(el.value !== 0) moveDice(this.state.slotDice, this.state.bowlDice, idx);
-        })
+        });
 
         this.state.bowlDice.sort(diceSorter);
         this.state.numOfDice = 5;
@@ -252,7 +252,7 @@ var gameManager = {
 
     // 게임 종료
     endGame() {
-        if(this.state.phase.curr !== 'End') return;
+        if(this.state.gameflow.curr !== 'End') return;
         this.state.currPlayer = -1;
         this.state.gradeList = this.calcGrade();
     },
@@ -290,5 +290,5 @@ var gameManager = {
         if(this.state.gameflow.curr !== 'End') return;
         this.state.gameflow.transit('Start');
         this.startGame(this.state.playerList);
-    }
-}
+    },
+};
