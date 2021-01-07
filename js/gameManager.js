@@ -101,7 +101,9 @@ var gameManager = {
 
     async rollEvent() {
         if(this.state.phase.curr !== 'Event') return;
-    
+        let diceBowlElem = document.getElementById('dice-bowl');
+        let tmpColor = window.getComputedStyle(diceBowlElem, null).backgroundColor;
+        diceBowlElem.style.backgroundColor = '#2f0b14';
 
         // intv가 낮을 수록 주사위 굴리는 애니메이션 주기가 짧아짐
         // 사다리꼴 모양의 애니메이션 횟수 - 주기 그래프를 갖는다.
@@ -147,6 +149,8 @@ var gameManager = {
             intv += (phase === -1) ? accel : (phase === 1) ? decel : 0;
             await sleep(intv);
         }
+        
+        diceBowlElem.style.backgroundColor = tmpColor;
     },
 
     // 슬롯과 보울의 주사위를 전부 정렬
