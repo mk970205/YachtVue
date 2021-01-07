@@ -55,4 +55,4 @@ var diceSorter = (lhs, rhs) => {
         (rhs.value == 0) ? -1 :
         (lhs.value < rhs.value) ? -1 : 
         (lhs.value > rhs.value) ? 1 : 0;
-}
+};

@@ -32,7 +32,7 @@
 <div id="score-table" v-if="state.gameflow.curr != 'Start'">
     <table>
         <tr>
-            <th>Turn{{ state.currTurn }}</th>
+            <th>Turn {{ state.currTurn }}</th>
             <th v-for="n in totalPlayer" :class="{ spotlight: (n == state.currPlayer) }">{{ state.playerList[n - 1] }}</th>
         </tr>
 
@@ -55,7 +55,8 @@
         <tr is="score-section" v-for="(item, idx) in mergeScore(comb.slice(6), state.playerScore.slice(6))" 
             :item="item" :idx="idx" :state="state" :total-player="totalPlayer" :offset="6" @click-comb="chooseComb">
         </tr> 
-        <tr class="stat"><th><div>Total</div></th>
+        <tr class="stat">
+            <th><div>Total</div></th>
             <td v-for="n in totalPlayer"><div :class="{ spotlight: isFristGrade(n) }">
                 {{ state.playerScore[13][n - 1] }}
             </div></td>
@@ -63,7 +64,7 @@
     </table>
 </div>
 
-<div id="game-area" class="centered-flex" v-fi="state.gameflow.curr != 'End'">
+<div id="game-area" class="centered-flex" v-if="state.gameflow.curr != 'End'">
     <div id="dice-slot" class="centered-flex">
         <dice :list="state.slotDice" @click-dice="slotToBowl"></dice>
     </div>
@@ -110,7 +111,7 @@ var startBoard = new Vue({
             gameManager.startGame(this.playerList);
         },
     }
-})
+});
 
 var scoreTable = new Vue({
     el: '#score-table',
@@ -135,7 +136,7 @@ var scoreTable = new Vue({
             return Array.isArray(gradeList) && gradeList.length && gradeList[n - 1].grade == 1;
         }
     },
-})
+});
 
 var gameArea = new Vue({
     el: '#game-area',
@@ -164,7 +165,7 @@ var gameArea = new Vue({
             gameManager.endTurn();
         },
     },
-})
+});
 
 var endBoard = new Vue({
     el: '#end-board',

@@ -15,7 +15,7 @@ img {
     height: 800px;
     padding: 0px 30px;
     float: left;
-    display: flet;
+    display: flex;
     flex-direction: column;
     background-color: #a5422a;
 }

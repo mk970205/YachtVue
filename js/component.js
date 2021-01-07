@@ -47,7 +47,7 @@ Vue.component('score-section', {
             <th><div>{{ item.name }}</div></th>\
             <td v-for="n in totalPlayer" @click="onClick(n)">\
                 <div>\
-                    <div v-if="item.score[n - 1] != -1"><strong>{{ item.core[n - 1] }}</strong></div>\
+                    <div v-if="item.score[n - 1] != -1"><strong>{{ item.score[n - 1] }}</strong></div>\
                     <div v-else-if="state.phase.curr == endState && state.currPlayer == n"\
                         id="candidate-score">\
                         {{ state.diceScore[idx + offset] }}\
@@ -76,11 +76,11 @@ Vue.component('grade-board', {
     },
     template: '\
         <div id="grade-board">\
-            <div class="grade-row" idx="grade-header">\
+            <div class="grade-row" id="grade-header">\
                 <div>GRADE</div> <div>NAME</div> <div>SCORE</div>\
             </div>\
             <div class="grade-row" v-for="item in gradeList">\
-                <div>{{ iterm.grade }}</div> <div>{{ item.name }}</div> <div>{{ item.score }}</div>\
+                <div>{{ item.grade }}</div> <div>{{ item.name }}</div> <div>{{ item.score }}</div>\
             </div>\
         </div>\
     ',

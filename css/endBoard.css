@@ -5,6 +5,7 @@
     flex-direction: column;
     align-items: center;
     background-color: #d6ddff;
+    float: left;
 }
 
 #winner-is {
