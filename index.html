@@ -18,6 +18,7 @@
 </head>
 
 <body>
+
 <div id="start-board" v-if="state.gameflow.curr == 'Start'">
     <div id="title">Yacht!</div>
     <div id="player-slot">
@@ -29,6 +30,7 @@
     </div>
     <button id="start-btn" @click="startGame">START</button>
 </div>
+
 <div id="score-table" v-if="state.gameflow.curr != 'Start'">
     <table>
         <tr>
@@ -37,7 +39,7 @@
         </tr>
 
         <tr is="score-section" v-for="(item, idx) in mergeScore(comb.slice(0, 6), state.playerScore.slice(0, 6))" 
-            :item="item" :idx="idx" :state="state" :total-player:="totalPlayer" @click-comb="chooseComb">
+            :item="item" :idx="idx" :state="state" :total-player="totalPlayer" @click-comb="chooseComb">
         </tr>
 
         <tr class="stat">
@@ -57,7 +59,7 @@
         </tr> 
         <tr class="stat">
             <th><div>Total</div></th>
-            <td v-for="n in totalPlayer"><div :class="{ spotlight: isFristGrade(n) }">
+            <td v-for="n in totalPlayer"><div :class="{ spotlight: isFirstGrade(n) }">
                 {{ state.playerScore[13][n - 1] }}
             </div></td>
         </tr>
@@ -79,6 +81,7 @@
         <button style="background-color: #3f51b5;" @click="endTurn" v-else>턴 종료</button>
     </div>
 </div>
+
 <div id="end-board" v-if="state.gameflow.curr == 'End'">
     <div id="winner-is">RESULT</div>
     <grade-board :grade-list="state.gradeList"></grade-board>
@@ -134,7 +137,11 @@ var scoreTable = new Vue({
         isFirstGrade(n) {
             let gradeList = this.state.gradeList;
             return Array.isArray(gradeList) && gradeList.length && gradeList[n - 1].grade == 1;
-        }
+        },
+
+        mergeScore(arr1, arr2) {
+            return Array(arr1.length).fill({}).map((_, idx) => { return { name: arr1[idx], score: arr2[idx] }; });
+        },
     },
 });
 

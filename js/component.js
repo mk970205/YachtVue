@@ -14,6 +14,10 @@ Vue.component('dice', {
         onClick(idx) {
             this.$emit('click-dice', idx);
         },
+
+        imgSrc(n) {
+            return `./resources/dice_${n}.png`;
+        },
     },
 });
 

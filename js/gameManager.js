@@ -200,7 +200,7 @@ var gameManager = {
     chooseComb(idx) {
         let pidx = this.state.currPlayer - 1;
         if(this.state.phase.curr !== 'End Turn') return;
-        if(this.state.plyaerScore[idx][pidx] !== -1) return;
+        if(this.state.playerScore[idx][pidx] !== -1) return;
         Vue.set(this.state.playerScore[idx], pidx, this.state.diceScore[idx]);
         this.state.phase.transit('Score');
         this.scoring();
