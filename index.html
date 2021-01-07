@@ -12,7 +12,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="./js/diceFunc.js"></script>
-    <script src="./js/utility.js"></script>
+    <script type="module" src="./js/utility.js"></script>
     <script src="./js/component.js"></script>
     <script src="./js/gameManager.js"></script>
 </head>
@@ -29,6 +29,7 @@
     </div>
     <button id="start-btn" @click="startGame">START</button>
 </div>
+
 <div id="score-table" v-if="state.gameflow.curr != 'Start'">
     <table>
         <tr>
@@ -64,26 +65,6 @@
     </table>
 </div>
 
-<div id="game-area" class="centered-flex" v-if="state.gameflow.curr != 'End'">
-    <div id="dice-slot" class="centered-flex">
-        <dice :list="state.slotDice" @click-dice="slotToBowl"></dice>
-    </div>
-    <div id="dice-bowl" class="centered-flex">
-        <div v-if="state.gameflow.curr == 'Playing'" id="roll-counter">
-            Roll {{ state.rollCount }} / {{ state.rollLimit }}</div>
-        <dice :list="state.bowlDice" @click-dice="bowlToSlot"></dice>
-    </div>
-    <div id="btn-container" class="centered-flex">
-        <button style="background-color: #2196f3;" @click="reroll" :disabled="state.numOfDice == 0">굴리기</button>
-        <button style="background-color: #3f51b5;" @click="popAll" v-if="state.numOfDice != 5">전부 꺼내기</button>
-        <button style="background-color: #3f51b5;" @click="endTurn" v-else>턴 종료</button>
-    </div>
-</div>
-<div id="end-board" v-if="state.gameflow.curr == 'End'">
-    <div id="winner-is">RESULT</div>
-    <grade-board :grade-list="state.gradeList"></grade-board>
-    <button id="restart-btn" @click="restart"><div>🔄</div></button>
-</div>
 
 <script type="text/javascript">
 

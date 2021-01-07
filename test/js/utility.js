@@ -34,5 +34,3 @@ function sleep(ms) {
 }
 
 window.ondragstart = function() { return false; };
-
-export { StateMachine, imgSrc, mergeScore, sleep };
